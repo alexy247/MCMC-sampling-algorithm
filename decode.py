@@ -8,7 +8,7 @@ max_threads = os.cpu_count()
 
 input_string = "щдшэсздбгдтиылъирдвсдпирвясндждягфгдогъзд бгдсынъьисздегясздргсдовяг биъьисзднтдбнёдщдыифвсиадшсвдсвдтиыифислоиадмвжэмиадориъгаджижд бгдмыгъясиорщрвяздбгжвсвывцдявфясогббвясзадндодыгтэрзсисгддвънбдшг въибдмыншг дъвоврзбвдяжыв бвхвдыит гыидолёвънсдщдбнюнцджиждпгдусвдмврэшнрвяз"
 
-def decode(input_string, original_letters, letters_count, max_trials, max_swaps, matrix):
+def decode_with_max_swaps(input_string, original_letters, letters_count, max_trials, max_swaps, matrix):
     letters = original_letters.copy()
 
     bestScore = 0
@@ -16,23 +16,38 @@ def decode(input_string, original_letters, letters_count, max_trials, max_swaps,
 
     for i in range(0, max_trials):
         shuffle(letters)
-        # bestTrialScore = 0
-        # for j in range(0, max_swaps):
+        bestTrialScore = 0
+        for j in range(0, max_swaps):
+            new_letters = swap(letters[:], letters_count)
+            newScore = score(new_letters, input_string, matrix)
+            if newScore > bestTrialScore:
+                letters = new_letters[:]
+                bestTrialScore = newScore
+            elif newScore == bestTrialScore:
+                if randrange(0,2) == 1:
+                    letters = new_letters[:]
+        if newScore > bestScore:
+            bestKey = letters[:]
+            bestScore = newScore
+            print('New bestScore: ', newScore, ', trial is: ', i, ', text is: ', transform_text(input_string, bestKey, original_letters))
+    return bestKey
+
+def decode_without_max_swaps(input_string, original_letters, letters_count, max_trials, matrix):
+    letters = original_letters.copy()
+
+    bestScore = 0
+    bestKey = letters[:]
+
+    for i in range(0, max_trials):
         new_letters = swap(letters[:], letters_count)
         newScore = score(new_letters, input_string, matrix)
-        # if newScore > bestTrialScore:
-        #     letters = new_letters[:]
-        #     bestTrialScore = newScore
-        # elif newScore == bestTrialScore:
-        #     if randrange(0,2) == 1:
-        #         letters = new_letters[:]
         if newScore > bestScore:
             bestKey = letters[:]
             bestScore = newScore
             print('New bestScore: ', newScore, ', trial is: ', i, ', text is: ', transform_text(input_string, bestKey, original_letters))
         elif newScore == bestScore:
             if randrange(0,2) == 1:
-                letters = new_letters[:]
+                bestKey = new_letters[:]
                 print('New bestScore: ', newScore, ', trial is: ', i, ', text is: ', transform_text(input_string, letters, original_letters))
     return bestKey
 
@@ -70,8 +85,9 @@ def transform_text(cipherText, key, original_letters):
         new_text += original_letters[key.index(letter)]
     return new_text
 
-def main_func(input_string, letters, letters_count, max_trials, max_swaps, matrix):
-    new_letters = decode(input_string, letters, letters_count, max_trials, max_swaps, matrix)
+def main_func(input_string, letters, letters_count, max_trials, matrix):
+    # Try 2 versions: use max count of swaps letters and use only itteration restrictions
+    new_letters = decode_without_max_swaps(input_string, letters, letters_count, max_trials, matrix)
     return transform_text(input_string, new_letters, letters)
 
 if __name__ == "__main__":
@@ -85,7 +101,7 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=max_threads) as executor:
         futures = []
         for thread in range(max_threads):
-            futures.append(executor.submit(main_func, input_string, letters, letters_count, max_trials, max_swaps, matrix))
+            futures.append(executor.submit(main_func, input_string, letters, letters_count, max_trials, matrix))
 
         for future in futures:
             print(future.result())
