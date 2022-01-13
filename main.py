@@ -35,7 +35,7 @@ def create_matrix(filename, letters, letters_count):
             if val == 1:
                 normalize_matrix[i][j] = 1 / sum_val
             else:
-                normalize_matrix[i][j] = round(val / sum_val, 3)
+                normalize_matrix[i][j] = val / sum_val
 
 
     with open('matrix.json', "w") as f:

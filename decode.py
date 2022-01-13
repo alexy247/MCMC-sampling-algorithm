@@ -2,9 +2,9 @@ import os
 from utils import get_letters, get_max_trials, get_max_swaps, open_matrix
 from random import shuffle, randrange
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
+import time
 
-max_threads = 2 * os.cpu_count()
+max_threads = os.cpu_count()
 
 input_string = "щдшэсздбгдтиылъирдвсдпирвясндждягфгдогъзд бгдсынъьисздегясздргсдовяг биъьисзднтдбнёдщдыифвсиадшсвдсвдтиыифислоиадмвжэмиадориъгаджижд бгдмыгъясиорщрвяздбгжвсвывцдявфясогббвясзадндодыгтэрзсисгддвънбдшг въибдмыншг дъвоврзбвдяжыв бвхвдыит гыидолёвънсдщдбнюнцджиждпгдусвдмврэшнрвяз"
 
@@ -16,27 +16,31 @@ def decode(input_string, original_letters, letters_count, max_trials, max_swaps,
 
     for i in range(0, max_trials):
         shuffle(letters)
-        bestTrialScore = 0
-        for j in range(0, max_swaps):
-            new_letters = swap(letters[:], letters_count)
-            newScore = score(new_letters, input_string, matrix)
-            if newScore > bestTrialScore:
-                letters = new_letters[:]
-                bestTrialScore = newScore
-            elif newScore == bestTrialScore:
-                if randrange(0,2) == 1:
-                    letters = new_letters[:]
-        if bestTrialScore > bestScore:
+        # bestTrialScore = 0
+        # for j in range(0, max_swaps):
+        new_letters = swap(letters[:], letters_count)
+        newScore = score(new_letters, input_string, matrix)
+        # if newScore > bestTrialScore:
+        #     letters = new_letters[:]
+        #     bestTrialScore = newScore
+        # elif newScore == bestTrialScore:
+        #     if randrange(0,2) == 1:
+        #         letters = new_letters[:]
+        if newScore > bestScore:
             bestKey = letters[:]
-            bestScore = bestTrialScore
-            print('New bestScore: ', bestTrialScore, ', trial is: ', i)
+            bestScore = newScore
+            print('New bestScore: ', newScore, ', trial is: ', i, ', text is: ', transform_text(input_string, bestKey, original_letters))
+        elif newScore == bestScore:
+            if randrange(0,2) == 1:
+                letters = new_letters[:]
+                print('New bestScore: ', newScore, ', trial is: ', i, ', text is: ', transform_text(input_string, letters, original_letters))
     return bestKey
 
 def swap(letters, letters_count):
     i = randrange(0, letters_count)
     j = randrange(0, letters_count)
-    while i == j:
-        j = randrange(0, letters_count)
+    if i == j:
+        swap(letters, letters_count)
     letters[i], letters[j] = letters[j], letters[i]
     return letters
 
@@ -71,6 +75,7 @@ def main_func(input_string, letters, letters_count, max_trials, max_swaps, matri
     return transform_text(input_string, new_letters, letters)
 
 if __name__ == "__main__":
+    start_time = time.time()
     letters = get_letters()
     letters_count = len(letters)
     max_trials = get_max_trials()
@@ -84,3 +89,6 @@ if __name__ == "__main__":
 
         for future in futures:
             print(future.result())
+    
+    finish_time = time.time()
+    print(finish_time - start_time)
