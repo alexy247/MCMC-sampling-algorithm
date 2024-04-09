@@ -11,11 +11,16 @@ def create_matrix(filename, letters, letters_count):
     matrix = [[1] * letters_count for i in range(letters_count)]
     text_prepared = ''
 
-    for letter in text:
-        if letter in letters:
-            text_prepared += letter
+    for symbol in text:
+        if symbol in letters:
+            text_prepared += symbol
+        elif symbol == '\n':
+            text_prepared += ' '
 
     text_prepared = re.sub(r'[\s]+|s' , ' ', text_prepared)
+
+    with open('text-prepared.txt', "w") as f:
+        f.write(text_prepared)
     text_prepared_len = len(text_prepared)
 
     for i, letter in enumerate(text_prepared):
@@ -46,4 +51,5 @@ if __name__ == "__main__":
     letters = get_letters()
     letters_count = len(letters)
 
+    # create_matrix('text-simple.txt', letters, letters_count)
     create_matrix('text.txt', letters, letters_count)

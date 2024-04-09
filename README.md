@@ -13,3 +13,5 @@ message = 'щдшэсздбгдтиылъирдвсдпирвясндждягф�
 
 # Links
 - [Simple way to understand structure of mcmc](https://towardsdatascience.com/applications-of-mcmc-for-cryptography-and-optimization-1f99222b7132)
+- [Enigma's process](https://towardsdatascience.com/breaking-the-enigma-code-in-python-with-mcmc-marvel-themed-9ceb358dd8ae)
+- [Decrypting solution](https://jfking50.github.io/decipher/)
